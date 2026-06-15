@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Electric Logistics | Eco-Friendly Delivery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- IMPORTANT: Replace YOUR_GOOGLE_API_KEY with your actual Google Maps API key -->
+    <!-- Get API key from: https://console.cloud.google.com/apis/credentials -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAAo46MVjVtxvU_pZo2JWZtneHpKhlI_ow&libraries=places,geometry"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1e40af;
+            --secondary: #0ea5e9;
+            --accent: #10b981;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --white: #ffffff;
+            --whatsapp: #25D366;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; color: var(--dark); background: var(--light); line-height: 1.6; }
+        
+        nav { background: var(--white); padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        .nav-links { display: flex; list-style: none; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; cursor: pointer !important; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--secondary); }
+        .call-btn { background: var(--primary); color: var(--white); padding: 0.7rem 1.5rem; border-radius: 0.5rem; border: none; cursor: pointer !important; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .call-btn:hover { background: var(--secondary); transform: translateY(-2px); }
+        .whatsapp-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--whatsapp); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--white); cursor: pointer !important; z-index: 999; transition: all 0.3s; text-decoration: none; border: none; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.5); }
+        .whatsapp-btn:hover { transform: scale(1.1); }
+        
+        .hero { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: var(--white); padding: 100px 2rem; text-align: center; }
+        .hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1.5rem; }
+        .hero p { font-size: clamp(1.1rem, 2vw, 1.3rem); margin-bottom: 2.5rem; opacity: 0.95; }
+        .hero-buttons { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+        .btn { padding: 1rem 2.5rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: all 0.3s; border: none; cursor: pointer !important; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; }
+        .btn-primary { background: var(--white); color: var(--primary); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,255,255,0.3); }
+        .btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); }
+        .btn-secondary:hover { background: var(--white); color: var(--primary); transform: translateY(-3px); }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        .section-title { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; text-align: center; margin-bottom: 1.5rem; color: var(--dark); }
+        .section-subtitle { text-align: center; color: var(--gray); font-size: 1.1rem; margin-bottom: 3rem; }
+        
+        .features { padding: 80px 2rem; background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .feature-card { background: var(--white); padding: 2.5rem; border-radius: 1rem; box-shadow: var(--shadow); transition: all 0.3s; border-top: 4px solid var(--secondary); }
+        .feature-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .feature-card i { font-size: 3rem; color: var(--secondary); margin-bottom: 1rem; }
+        .feature-card h3 { font-size: 1.3rem; margin-bottom: 0.8rem; color: var(--dark); }
+        
+        /* MAP SECTION */
+        .map-section { padding: 80px 2rem; background: var(--white); }
+        .map-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+        
+        #deliveryMap { width: 100%; height: 500px; border-radius: 15px; box-shadow: var(--shadow); }
+        
+        .map-controls { background: var(--white); padding: 2.5rem; border-radius: 15px; box-shadow: var(--shadow); position: relative; }
+        .map-controls h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--primary); }
+        
+        .location-input-group { margin-bottom: 1.5rem; position: relative; }
+        .location-label { font-weight: 600; color: var(--dark); margin-bottom: 0.5rem; display: block; }
+        .location-input { width: 100%; padding: 0.8rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-family: 'Poppins', sans-serif; font-size: 0.95rem; }
+        .location-input:focus { outline: none; border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        
+        .suggestions-list { background: var(--white); border: 1px solid #e2e8f0; border-radius: 0.5rem; max-height: 400px; overflow-y: auto; display: none; margin-top: 0.5rem; position: absolute; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; }
+        .suggestions-list.active { display: block; }
+        .suggestion-item { padding: 0.8rem; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: background 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: var(--white); }
+        .suggestion-item:hover { background: #f0f9ff; color: var(--secondary); }
+        .suggestion-item:last-child { border-bottom: none; }
+        
+        .swap-btn { width: 100%; padding: 0.8rem; background: var(--secondary); color: var(--white); border: none; border-radius: 0.5rem; cursor: pointer !important; font-weight: 600; transition: all 0.3s; margin: 1rem 0; }
+        .swap-btn:hover { background: var(--primary); transform: scale(1.05); }
+        
+        .distance-result { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 1.5rem; border-radius: 0.75rem; margin-top: 1.5rem; border-left: 4px solid var(--accent); display: none; }
+        .distance-result.show { display: block; }
+        .distance-value { font-size: 2rem; font-weight: 800; color: var(--accent); margin-bottom: 0.5rem; }
+        .distance-label { color: var(--gray); font-weight: 600; }
+        
+        .tools-section { padding: 80px 2rem; background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%); }
+        .tools-container { max-width: 1200px; margin: 0 auto; }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-top: 3rem; }
+        .carbon-calc, .cert-generator { padding: 2.5rem; border-radius: 1.2rem; box-shadow: var(--shadow); }
+        .carbon-calc { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
+        .cert-generator { background: linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%); }
+        .calc-title, .cert-title { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; font-size: 1.4rem; font-weight: 700; }
+        .calc-title { color: var(--accent); }
+        .cert-title { color: var(--primary); }
+        
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .form-label { font-weight: 600; color: var(--dark); font-size: 0.95rem; }
+        .form-input, .calc-input { padding: 0.8rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-family: 'Poppins', sans-serif; font-size: 0.95rem; width: 100%; }
+        .form-input:focus, .calc-input:focus { outline: none; border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        
+        .button-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .submit-button, .preview-button, .calc-button { padding: 1rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer !important; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.3s; color: var(--white); }
+        .submit-button { background: var(--primary); }
+        .submit-button:hover { background: var(--secondary); transform: translateY(-2px); }
+        .preview-button { background: var(--accent); }
+        .preview-button:hover { background: #059669; transform: translateY(-2px); }
+        .calc-button { background: var(--accent); width: 100%; }
+        .calc-button:hover { background: #059669; transform: translateY(-2px); }
+        
+        .carbon-result { background: var(--white); border-radius: 0.5rem; padding: 1.5rem; margin-top: 1.5rem; display: none; }
+        .carbon-result.show { display: block; }
+        .result-row { display: flex; justify-content: space-between; padding: 0.8rem; border-bottom: 1px solid #f0fdf4; }
+        .result-label { color: var(--dark); font-weight: 500; }
+        .result-value { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+        
+        .certificate { display: none; }
+        .certificate.show { display: block; }
+        .certificate-content { width: 1000px; margin: 0 auto; background: #ffffff; padding: 0; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(16, 185, 129, 0.3); }
+        .cert-header { background: linear-gradient(135deg, #1e7e34 0%, #16a34a 30%, #22c55e 60%, #86efac 100%); color: white; padding: 4rem 3rem; text-align: center; }
+        .cert-logo { font-size: 6rem; margin-bottom: 1.5rem; }
+        .cert-company { font-size: 2.2rem; font-weight: 900; margin-bottom: 0.8rem; }
+        .cert-subtitle { font-size: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; }
+        .cert-body { padding: 3.5rem; background: #fafafa; }
+        .cert-section { margin-bottom: 3rem; background: #ffffff; padding: 2.5rem; border-radius: 15px; border-left: 8px solid #16a34a; box-shadow: 0 4px 20px rgba(22, 163, 74, 0.15); }
+        .cert-section-title { font-weight: 900; color: #1e7e34; margin-bottom: 2rem; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
+        .cert-detail { display: flex; justify-content: space-between; padding: 1.2rem 0; border-bottom: 2px solid #e5e7eb; }
+        .cert-detail:last-child { border-bottom: none; }
+        .cert-label { color: #059669; font-weight: 700; font-size: 1rem; }
+        .cert-value { color: #1e7e34; font-weight: 800; font-size: 1.05rem; }
+        
+        .cert-impact { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem; margin-bottom: 3rem; }
+        .impact-card { background: linear-gradient(135deg, #16a34a 0%, #15803d 50%, #166534 100%); color: white; padding: 3rem 2rem; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(22, 163, 74, 0.4); border: 3px solid #22c55e; }
+        .impact-number { font-size: 3.5rem; font-weight: 900; margin-bottom: 1rem; }
+        .impact-label { font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; }
+        
+        .cert-footer { text-align: center; border-top: 4px solid #16a34a; padding-top: 3rem; margin-top: 2rem; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding-bottom: 3rem; }
+        .cert-footer p { margin: 0 0 1.8rem 0; font-size: 1.05rem; color: #1e7e34; font-weight: 600; }
+        .cert-id { font-family: 'Courier New', monospace; font-size: 1rem; color: #16a34a; font-weight: 900; margin-bottom: 1rem; }
+        .cert-url { font-family: 'Courier New', monospace; font-size: 0.9rem; color: #059669; margin-bottom: 1.5rem; font-weight: 700; }
+        .cert-message { color: #16a34a; font-size: 1.1rem; font-weight: 800; }
+        
+        .download-button { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: var(--white); padding: 1.5rem 2.5rem; border: none; border-radius: 12px; font-weight: 800; cursor: pointer !important; font-size: 1.1rem; margin-top: 2rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 1rem; box-shadow: 0 10px 30px rgba(22, 163, 74, 0.4); transition: all 0.3s; }
+        .download-button:hover { background: linear-gradient(135deg, #15803d 0%, #166534 100%); transform: translateY(-3px); }
+        
+        .services { padding: 80px 2rem; background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%); }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .service-card { background: var(--white); padding: 3rem; border-radius: 1rem; box-shadow: var(--shadow); transition: all 0.3s; border-left: 5px solid var(--secondary); }
+        .service-card:hover { transform: translateY(-5px); }
+        .service-card i { font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem; }
+        .service-card h3 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--dark); }
+        
+        .contact { padding: 80px 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: var(--white); }
+        .contact-content { max-width: 600px; margin: 0 auto; text-align: center; }
+        .contact h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1.5rem; }
+        .contact p { font-size: 1.1rem; margin-bottom: 2.5rem; opacity: 0.95; }
+        .contact-buttons { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+        .contact-btn { padding: 1rem 2rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: all 0.3s; border: none; cursor: pointer !important; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1rem; }
+        .contact-btn-primary { background: var(--white); color: var(--primary); }
+        .contact-btn-primary:hover { transform: translateY(-3px); }
+        .contact-btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); }
+        .contact-btn-secondary:hover { background: var(--white); color: var(--primary); }
+        
+        .footer { background: var(--dark); color: var(--white); padding: 3rem 2rem; text-align: center; }
+        .footer-links { display: flex; gap: 2rem; justify-content: center; margin-bottom: 1.5rem; list-style: none; flex-wrap: wrap; }
+        .footer-links a { color: var(--white); text-decoration: none; transition: color 0.3s; }
+        .footer-links a:hover { color: var(--secondary); }
+        .social-links { display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem; list-style: none; }
+        .social-links a { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); text-decoration: none; transition: all 0.3s; }
+        .social-links a:hover { background: var(--secondary); }
+
+        .api-warning { background: #fef3c7; border: 2px solid #f59e0b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; color: #92400e; font-weight: 600; text-align: center; }
+
+        @media (max-width: 768px) {
+            .map-container { grid-template-columns: 1fr; }
+            #deliveryMap { height: 300px; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .button-group { grid-template-columns: 1fr; }
+            .cert-impact { grid-template-columns: 1fr; }
+            .certificate-content { width: 95vw; }
+        }
+
+        /* WEIGHT SURCHARGE */
+        .weight-selector { margin-top: 1.2rem; margin-bottom: 1.2rem; }
+        .weight-selector > label { font-weight: 600; color: var(--dark); font-size: 0.95rem; display: block; margin-bottom: 0.6rem; }
+        .weight-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .weight-option { position: relative; }
+        .weight-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+        .weight-option label { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.6rem 0.4rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; text-align: center; background: var(--white); line-height: 1.4; }
+        .weight-option label .w-range { font-weight: 700; color: var(--dark); font-size: 0.82rem; }
+        .weight-option label .w-charge { font-weight: 800; color: var(--accent); font-size: 0.88rem; }
+        .weight-option label .w-desc { font-size: 0.7rem; color: var(--gray); margin-top: 2px; }
+        .weight-option input[type="radio"]:checked + label { border-color: var(--secondary); background: #f0f9ff; box-shadow: 0 0 0 3px rgba(14,165,233,0.15); }
+        .weight-option input[type="radio"]:checked + label .w-range { color: var(--primary); }
+
+        /* CONTACT FORM */
+        .contact-form-wrapper { margin-top: 3rem; background: rgba(255,255,255,0.12); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.25); border-radius: 1.2rem; padding: 2.5rem; max-width: 650px; margin-left: auto; margin-right: auto; text-align: left; }
+        .contact-form-wrapper h3 { font-size: 1.4rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; text-align: center; }
+        .contact-form-wrapper p.form-desc { font-size: 0.95rem; color: rgba(255,255,255,0.8); text-align: center; margin-bottom: 2rem; }
+        .contact-form .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        .contact-form .cf-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+        .contact-form label { font-weight: 600; font-size: 0.9rem; color: rgba(255,255,255,0.9); }
+        .contact-form input, .contact-form select, .contact-form textarea { width: 100%; padding: 0.8rem 1rem; border: 2px solid rgba(255,255,255,0.3); border-radius: 0.5rem; background: rgba(255,255,255,0.15); color: var(--white); font-family: 'Poppins', sans-serif; font-size: 0.95rem; transition: border-color 0.3s, background 0.3s; }
+        .contact-form input::placeholder, .contact-form textarea::placeholder { color: rgba(255,255,255,0.55); }
+        .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { outline: none; border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.22); }
+        .contact-form select option { background: var(--primary); color: var(--white); }
+        .contact-form textarea { resize: vertical; min-height: 110px; }
+        .send-btn { width: 100%; padding: 1rem; background: var(--white); color: var(--primary); border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer !important; display: flex; align-items: center; justify-content: center; gap: 0.6rem; transition: all 0.3s; margin-top: 0.5rem; }
+        .send-btn:hover { background: #e0f2fe; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .form-success { display: none; text-align: center; padding: 1.5rem; background: rgba(16,185,129,0.2); border: 2px solid rgba(16,185,129,0.6); border-radius: 0.75rem; color: var(--white); font-weight: 600; margin-top: 1rem; }
+        .form-success.show { display: block; }
+        @media (max-width: 600px) { .contact-form .cf-row { grid-template-columns: 1fr; } }
+
+        /* FLEET SECTION */
+        .fleet { padding: 80px 2rem; background: var(--white); }
+        .fleet-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; max-width: 1100px; margin: 0 auto; }
+        .fleet-visual { position: relative; background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%); border-radius: 1.5rem; overflow: hidden; box-shadow: 0 20px 50px rgba(30,64,175,0.15); padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 360px; }
+        .fleet-visual svg { width: 100%; max-width: 480px; height: auto; }
+        .fleet-badge { background: var(--accent); color: var(--white); padding: 0.4rem 1rem; border-radius: 2rem; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 1rem; }
+        .fleet-info { display: flex; flex-direction: column; gap: 1.5rem; }
+        .fleet-name { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1.2; }
+        .fleet-name span { color: var(--accent); }
+        .fleet-tagline { color: var(--gray); font-size: 1.05rem; }
+        .fleet-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .spec-card { background: linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%); border-radius: 0.75rem; padding: 1rem 1.2rem; border-left: 4px solid var(--secondary); }
+        .spec-label { font-size: 0.78rem; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.2rem; }
+        .spec-value { font-size: 1.05rem; font-weight: 800; color: var(--primary); }
+        .fleet-cta { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--primary); color: var(--white); padding: 0.9rem 2rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; border: none; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
+        .fleet-cta:hover { background: var(--secondary); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(14,165,233,0.3); }
+        @media (max-width: 768px) { .fleet-showcase { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="#home" class="logo"><i class="fas fa-leaf"></i> GEL</a>
+            <ul class="nav-links">
+                <li><a href="#features" onclick="scrollToSection('features'); return false;">Features</a></li>
+                <li><a href="#fleet" onclick="scrollToSection('fleet'); return false;">Our Fleet</a></li>
+                <li><a href="#map" onclick="scrollToSection('map'); return false;">Distance Calculator</a></li>
+                <li><a href="#tools" onclick="scrollToSection('tools'); return false;">Certificate</a></li>
+                <li><a href="#contact" onclick="scrollToSection('contact'); return false;">Contact</a></li>
+            </ul>
+            <button class="call-btn" onclick="openWhatsApp()"><i class="fab fa-whatsapp"></i> Chat Now</button>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>🌱 Eco-Friendly Delivery for a Greener Tomorrow</h1>
+            <p>100% Electric Vehicle Cargo Delivery Service in Delhi NCR. Sustainable, Reliable, and 30% Cheaper than Diesel.</p>
+            <div class="hero-buttons">
+                <a href="#map" class="btn btn-primary" onclick="scrollToSection('map'); return false;">Calculate Distance</a>
+                <a href="#contact" class="btn btn-secondary" onclick="scrollToSection('contact'); return false;">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Green Electric Logistics?</h2>
+            <div class="features-grid">
+                <div class="feature-card"><i class="fas fa-leaf"></i><h3>100% Electric + CNG</h3><p>Zero-emission electric vehicles and clean-burning CNG mini trucks for eco-friendly delivery.</p></div>
+                <div class="feature-card"><i class="fas fa-rupee-sign"></i><h3>30% Cheaper</h3><p>Significantly lower operational costs compared to traditional diesel vehicles.</p></div>
+                <div class="feature-card"><i class="fas fa-clock"></i><h3>Same-Day Delivery</h3><p>Fast, reliable delivery within 2-4 hours across Okhla Industrial Area.</p></div>
+                <div class="feature-card"><i class="fas fa-certificate"></i><h3>Instant Certificates</h3><p>Generate beautiful carbon impact certificates instantly.</p></div>
+                <div class="feature-card"><i class="fas fa-chart-line"></i><h3>Track Impact</h3><p>Real-time carbon savings calculator and environmental impact proof.</p></div>
+                <div class="feature-card"><i class="fas fa-handshake"></i><h3>CSR Support</h3><p>Help your company meet sustainability and ESG targets.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FLEET SECTION -->
+    <section class="fleet" id="fleet">
+        <div class="container">
+            <h2 class="section-title">&#127811; Our CNG Fleet</h2>
+            <p class="section-subtitle">Purpose-built electric cargo vehicles for urban last-mile delivery</p>
+            <div class="fleet-showcase">
+                <div class="fleet-visual">
+                    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAeAB4AAD/4QL0RXhpZgAATU0AKgAAAAgABAE7AAIAAAAOAAABSodpAAQAAAABAAABWJydAAEAAAAcAAAC0OocAAcAAAEMAAAAPgAAAAAc6gAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdmlzaGFhbCBrdW1hcgAABZADAAIAAAAUAAACppAEAAIAAAAUAAACupKRAAIAAAADOTAAAJKSAAIAAAADOTAAAOocAAcAAAEMAAABmgAAAAAc6gAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAyNjowNjoxNSAxMjo1MzoxOQAyMDI2OjA2OjE1IDEyOjUzOjE5AAAAdgBpAHMAaABhAGEAbAAgAGsAdQBtAGEAcgAAAP/hBCBodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0n77u/JyBpZD0nVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkJz8+DQo8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIj48cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPjxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSJ1dWlkOmZhZjViZGQ1LWJhM2QtMTFkYS1hZDMxLWQzM2Q3NTE4MmYxYiIgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIi8+PHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9InV1aWQ6ZmFmNWJkZDUtYmEzZC0xMWRhLWFkMzEtZDMzZDc1MTgyZjFiIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iPjx4bXA6Q3JlYXRlRGF0ZT4yMDI2LTA2LTE1VDEyOjUzOjE5Ljg5NTwveG1wOkNyZWF0ZURhdGU+PC9yZGY6RGVzY3JpcHRpb24+PHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9InV1aWQ6ZmFmNWJkZDUtYmEzZC0xMWRhLWFkMzEtZDMzZDc1MTgyZjFiIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iPjxkYzpjcmVhdG9yPjxyZGY6U2VxIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+PHJkZjpsaT52aXNoYWFsIGt1bWFyPC9yZGY6bGk+PC9yZGY6U2VxPg0KCQkJPC9kYzpjcmVhdG9yPjwvcmRmOkRlc2NyaXB0aW9uPjwvcmRmOlJERj48L3g6eG1wbWV0YT4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg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" alt="Tata Ace Gold CNG High Deck Mini Truck" style="width:100%; max-width:480px; height:auto; border-radius: 1rem; box-shadow: 0 12px 35px rgba(0,0,0,0.18);">
+                    <div class="fleet-badge">&#127807; Low Emission CNG</div>
+                </div>
+
+                <div class="fleet-info">
+                    <div>
+                        <div class="fleet-name">Tata Ace Gold <span>CNG High Deck</span></div>
+                        <div class="fleet-tagline">India's most trusted mini truck — now in clean-burning CNG, with a high-deck cargo box for bulkier loads and lower running costs.</div>
+                    </div>
+                    <div class="fleet-specs">
+                        <div class="spec-card">
+                            <div class="spec-label">Payload Capacity</div>
+                            <div class="spec-value">750 kg</div>
+                        </div>
+                        <div class="spec-card">
+                            <div class="spec-label">Range per Fill</div>
+                            <div class="spec-value">~200 km</div>
+                        </div>
+                        <div class="spec-card">
+                            <div class="spec-label">Refueling Time</div>
+                            <div class="spec-value">~5 min</div>
+                        </div>
+                        <div class="spec-card">
+                            <div class="spec-label">Fuel Type</div>
+                            <div class="spec-value">CNG &#127807;</div>
+                        </div>
+                        <div class="spec-card">
+                            <div class="spec-label">Engine Power</div>
+                            <div class="spec-value">12.4 kW</div>
+                        </div>
+                        <div class="spec-card">
+                            <div class="spec-label">Top Speed</div>
+                            <div class="spec-value">60 km/h</div>
+                        </div>
+                    </div>
+                    <button class="fleet-cta" onclick="scrollToSection('map'); return false;">
+                        <i class="fas fa-calculator"></i> Calculate Delivery Cost
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAP SECTION -->
+    <section class="map-section" id="map">
+        <div class="container">
+            <h2 class="section-title">📍 Calculate Distance & Pricing</h2>
+            <p class="section-subtitle">Select pickup and delivery locations on the map or enter addresses manually</p>
+            
+            <div class="map-container">
+                <div>
+                    <div id="deliveryMap"></div>
+                </div>
+                
+                <div class="map-controls">
+                    <h3>📍 Location Details</h3>
+                    
+                    <div id="apiWarning" class="api-warning" style="display:none;">
+                        ⚠️ Google API Key not configured. Locations are limited to presets. 
+                        <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: inherit; text-decoration: underline;">Get API Key</a>
+                    </div>
+                    
+                    <div class="location-input-group">
+                        <label class="location-label">🏢 Pickup Location</label>
+                        <input type="text" id="pickupInput" class="location-input" placeholder="Enter pickup location..." autocomplete="off">
+                        <div class="suggestions-list" id="pickupSuggestions"></div>
+                    </div>
+                    
+                    <button class="swap-btn" onclick="swapLocations()">⇅ Swap Locations</button>
+                    
+                    <div class="location-input-group">
+                        <label class="location-label">📦 Delivery Location</label>
+                        <input type="text" id="deliveryInput" class="location-input" placeholder="Enter delivery location..." autocomplete="off">
+                        <div class="suggestions-list" id="deliverySuggestions"></div>
+                    </div>
+                    
+                    <!-- WEIGHT SURCHARGE SELECTOR -->
+                    <div class="weight-selector">
+                        <label>⚖️ Cargo Weight</label>
+                        <div class="weight-options">
+                            <div class="weight-option">
+                                <input type="radio" name="cargoWeight" id="w1" value="0" checked>
+                                <label for="w1"><span class="w-range">0 – 100 kg</span><span class="w-charge">+₹0</span><span class="w-desc">Parcels / e-commerce</span></label>
+                            </div>
+                            <div class="weight-option">
+                                <input type="radio" name="cargoWeight" id="w2" value="15">
+                                <label for="w2"><span class="w-range">101 – 250 kg</span><span class="w-charge">+₹15</span><span class="w-desc">Groceries / appliances</span></label>
+                            </div>
+                            <div class="weight-option">
+                                <input type="radio" name="cargoWeight" id="w3" value="30">
+                                <label for="w3"><span class="w-range">251 – 450 kg</span><span class="w-charge">+₹30</span><span class="w-desc">Heavy cargo</span></label>
+                            </div>
+                            <div class="weight-option">
+                                <input type="radio" name="cargoWeight" id="w4" value="50">
+                                <label for="w4"><span class="w-range">451 – 550 kg</span><span class="w-charge">+₹50</span><span class="w-desc">Heavy cargo</span></label>
+                            </div>
+                            <div class="weight-option" style="grid-column: 1 / -1;">
+                                <input type="radio" name="cargoWeight" id="w5" value="75">
+                                <label for="w5"><span class="w-range">551 – 750 kg</span><span class="w-charge">+₹75</span><span class="w-desc">Near-capacity load (Tata Ace)</span></label>
+                            </div>
+                        </div>
+                    </div>
+                                        <button class="calc-button" onclick="calculateDistance()"><i class="fas fa-calculator"></i> Calculate Distance</button>
+                    
+                    <div class="distance-result" id="distanceResult">
+                        <div class="distance-value" id="distanceValue">0 km</div>
+                        <div class="distance-label">Estimated Distance</div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(16, 185, 129, 0.2);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--dark); font-weight: 600;">Base Price:</span>
+                                <span style="color: var(--accent); font-weight: 700;">Rs 160</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--dark); font-weight: 600;">Per KM:</span>
+                                <span style="color: var(--accent); font-weight: 700;">Rs 20</span>
+                            </div>
+                            <div id="surchargeRow" style="display:none; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--dark); font-weight: 600;">Weight Surcharge:</span>
+                                <span style="color: var(--secondary); font-weight: 700;" id="surchargeAmount">+Rs 0</span>
+                            </div>
+                            <div id="loyaltyRow" style="display:none; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--dark); font-weight: 600;">🎁 Loyalty Discount (8%):</span>
+                                <span style="color: var(--accent); font-weight: 700;" id="discountAmount">-Rs 0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 2px solid var(--accent);">
+                                <span style="color: var(--primary); font-weight: 800;">TOTAL PRICE:</span>
+                                <span style="color: var(--primary); font-weight: 800; font-size: 1.2rem;" id="totalPrice">Rs 160</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+    <span style="color: var(--dark); font-weight: 600;">Minimum Charge:</span>
+    <span style="color: var(--accent); font-weight: 700;">Rs 160 (up to 3 km)</span>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+    <span style="color: var(--dark); font-weight: 600;">🎁 Loyalty Discount:</span>
+    <span style="color: var(--accent); font-weight: 700;">8% off from your 5th trip onwards</span>
+</div>
+
+    <section class="tools-section" id="tools">
+        <div class="tools-container">
+            <h2 class="section-title">⚡ Carbon Certificate Generator</h2>
+            <p class="section-subtitle">Generate your beautiful carbon impact certificate with all delivery details</p>
+            
+            <div class="tools-grid">
+                <div class="carbon-calc">
+                    <div class="calc-title"><i class="fas fa-tree"></i> Carbon Savings</div>
+                    <div class="form-group">
+                        <label class="form-label">📍 Distance (km)</label>
+                        <input type="number" id="carbondistance" class="calc-input" placeholder="Enter distance from map..." min="1" max="100" step="0.5">
+                    </div>
+                    <button class="calc-button" onclick="calculateCarbon()"><i class="fas fa-calculator"></i> Calculate Impact</button>
+                    <div class="carbon-result" id="carbonResult">
+                        <div class="result-row"><span class="result-label"><i class="fas fa-cloud"></i> CO2 Saved</span><span class="result-value" id="co2Saved">0 kg</span></div>
+                        <div class="result-row"><span class="result-label"><i class="fas fa-tree"></i> Trees Equivalent</span><span class="result-value" id="treesEquiv">0</span></div>
+                        <div class="result-row"><span class="result-label"><i class="fas fa-wind"></i> Air Quality Impact</span><span class="result-value" id="airQuality">0 min</span></div>
+                        <div class="result-row"><span class="result-label"><i class="fas fa-coins"></i> Diesel Cost Avoided</span><span class="result-value" id="dieselSaved">Rs 0</span></div>
+                    </div>
+                </div>
+
+                <div class="cert-generator">
+                    <div class="cert-title"><i class="fas fa-certificate"></i> Generate Certificate</div>
+                    <div class="form-group">
+                        <label class="form-label">👤 Client Name</label>
+                        <input type="text" id="clientName" class="form-input" placeholder="Enter your name...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">🏢 Pickup Location</label>
+                        <input type="text" id="certPickup" class="form-input" placeholder="Pickup location...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">📦 Delivery Location</label>
+                        <input type="text" id="certDelivery" class="form-input" placeholder="Delivery location...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">📏 Distance (km)</label>
+                        <input type="number" id="certDistance" class="form-input" placeholder="Distance..." min="1" max="100" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">📅 Delivery Date</label>
+                        <input type="date" id="deliveryDate" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">📧 Email</label>
+                        <input type="email" id="contactEmail" class="form-input" placeholder="your@email.com">
+                    </div>
+                    <div class="button-group">
+                        <button class="preview-button" onclick="generateAndPreviewCertificate()"><i class="fas fa-eye"></i> Preview</button>
+                        <button class="submit-button" onclick="generateAndDownloadCertificate()"><i class="fas fa-download"></i> Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="certificatePreview" class="certificate"></div>
+    <div style="text-align: center; margin-top: 2rem;">
+        <button id="downloadButtonContainer" class="download-button" onclick="downloadCertificatePDF()" style="display: none;"><i class="fas fa-file-pdf"></i> Download as PDF</button>
+    </div>
+
+    <section class="contact" id="contact">
+        <div class="contact-content">
+            <h2>Ready to Go Green?</h2>
+            <p>Join thousands of businesses making a difference with eco-friendly delivery. Start your sustainable journey today!</p>
+            <div class="contact-buttons">
+                <a href="https://wa.me/919740530022?text=Hi%20GEL%21%20I%20want%20to%20know%20more" target="_blank" class="contact-btn contact-btn-primary"><i class="fab fa-whatsapp"></i> WhatsApp Us</a>
+                <button class="contact-btn contact-btn-secondary" onclick="scrollToSection('map'); return false;"><i class="fas fa-calculator"></i> Calculate Now</button>
+            </div>
+            <div class="contact-form-wrapper">
+                <h3>✉️ Send Us a Message</h3>
+                <p class="form-desc">Have questions or queries? Fill in the form below and we'll get back to you shortly.</p>
+                <form class="contact-form" id="contactRequestForm" onsubmit="submitContactForm(event)">
+                    <div class="cf-row">
+                        <div class="cf-group">
+                            <label for="cf_name">👤 Full Name *</label>
+                            <input type="text" id="cf_name" placeholder="Your full name" required>
+                        </div>
+                        <div class="cf-group">
+                            <label for="cf_email">📧 Email Address *</label>
+                            <input type="email" id="cf_email" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+                    <div class="cf-row">
+                        <div class="cf-group">
+                            <label for="cf_phone">📱 Phone Number</label>
+                            <input type="tel" id="cf_phone" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="cf-group">
+                            <label for="cf_subject">📋 Subject *</label>
+                            <select id="cf_subject" required>
+                                <option value="" disabled selected>Select a topic…</option>
+                                <option value="Pricing Enquiry">Pricing Enquiry</option>
+                                <option value="Delivery Booking">Delivery Booking</option>
+                                <option value="Route / Coverage">Route / Coverage</option>
+                                <option value="Carbon Certificate">Carbon Certificate</option>
+                                <option value="Partnership">Partnership</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="cf-group">
+                        <label for="cf_message">💬 Message *</label>
+                        <textarea id="cf_message" placeholder="Tell us how we can help you…" required></textarea>
+                    </div>
+                    <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i> Send Message</button>
+                </form>
+                <div class="form-success" id="formSuccess">
+                    ✅ Your email app should now be open with your message ready, addressed to <strong>greenelectriclogistics@gmail.com</strong>. Please hit send to deliver it!
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <ul class="footer-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#map">Distance Calculator</a></li>
+            <li><a href="#tools">Certificate</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <ul class="social-links">
+            <li><a href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i></a></li>
+            <li><a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a></li>
+            <li><a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+        </ul>
+        <p>&copy; 2026 Green Electric Logistics. All rights reserved.</p>
+    </footer>
+
+    <a href="https://wa.me/919740530022" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i></a>
+
+    <script>
+        let map;
+        let pickupMarker;
+        let deliveryMarker;
+        let routeLine;
+        let pickupCoords = null;
+        let deliveryCoords = null;
+        let pickupAutocomplete;
+        let deliveryAutocomplete;
+        let googleApiLoaded = false;
+
+        function initMap() {
+            map = L.map('deliveryMap').setView([28.5244, 77.2497], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Check if Google API is loaded
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                googleApiLoaded = true;
+                initializeGooglePlacesAutocomplete();
+            } else {
+                document.getElementById('apiWarning').style.display = 'block';
+                console.warn('Google Places API not loaded. Using Nominatim fallback.');
+                initializeFallbackAutocomplete();
+            }
+        }
+
+        function initializeGooglePlacesAutocomplete() {
+            const pickupInput = document.getElementById('pickupInput');
+            const deliveryInput = document.getElementById('deliveryInput');
+
+            // Create autocomplete instances with India country restriction
+            pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, {
+                types: ['geocode'],
+                componentRestrictions: { country: 'in' },
+                bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(28.3, 76.7),   // Southwest
+                    new google.maps.LatLng(29.0, 77.6)    // Northeast
+                )
+            });
+
+            deliveryAutocomplete = new google.maps.places.Autocomplete(deliveryInput, {
+                types: ['geocode'],
+                componentRestrictions: { country: 'in' },
+                bounds: new google.maps.LatLngBounds(
+                    new google.maps.LatLng(28.3, 76.7),
+                    new google.maps.LatLng(29.0, 77.6)
+                )
+            });
+
+            // Handle place selection for pickup
+            pickupAutocomplete.addListener('place_changed', function() {
+                const place = pickupAutocomplete.getPlace();
+                if (!place.geometry) {
+                    console.log('Geocoder failed');
+                    return;
+                }
+
+                const coords = [place.geometry.location.lat(), place.geometry.location.lng()];
+                const locationName = place.formatted_address;
+                selectPickupLocation(locationName, coords);
+            });
+
+            // Handle place selection for delivery
+            deliveryAutocomplete.addListener('place_changed', function() {
+                const place = deliveryAutocomplete.getPlace();
+                if (!place.geometry) {
+                    console.log('Geocoder failed');
+                    return;
+                }
+
+                const coords = [place.geometry.location.lat(), place.geometry.location.lng()];
+                const locationName = place.formatted_address;
+                selectDeliveryLocation(locationName, coords);
+            });
+        }
+
+        function initializeFallbackAutocomplete() {
+            document.getElementById('pickupInput').addEventListener('input', handlePickupInput);
+            document.getElementById('deliveryInput').addEventListener('input', handleDeliveryInput);
+        }
+
+        function handlePickupInput() {
+            const input = document.getElementById('pickupInput').value.trim();
+            const suggestions = document.getElementById('pickupSuggestions');
+            
+            if (input.length > 2 && !googleApiLoaded) {
+                // Use Nominatim for geocoding if Google API not available
+                geocodeLocationNominatim(input, (results) => {
+                    suggestions.innerHTML = '';
+                    results.forEach(result => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.textContent = result.name;
+                        div.onclick = () => selectPickupLocation(result.name, result.coords);
+                        suggestions.appendChild(div);
+                    });
+                    if (results.length > 0) suggestions.classList.add('active');
+                    else suggestions.classList.remove('active');
+                });
+            } else {
+                suggestions.classList.remove('active');
+            }
+        }
+
+        function handleDeliveryInput() {
+            const input = document.getElementById('deliveryInput').value.trim();
+            const suggestions = document.getElementById('deliverySuggestions');
+            
+            if (input.length > 2 && !googleApiLoaded) {
+                // Use Nominatim for geocoding if Google API not available
+                geocodeLocationNominatim(input, (results) => {
+                    suggestions.innerHTML = '';
+                    results.forEach(result => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.textContent = result.name;
+                        div.onclick = () => selectDeliveryLocation(result.name, result.coords);
+                        suggestions.appendChild(div);
+                    });
+                    if (results.length > 0) suggestions.classList.add('active');
+                    else suggestions.classList.remove('active');
+                });
+            } else {
+                suggestions.classList.remove('active');
+            }
+        }
+
+        function selectPickupLocation(locationName, coords) {
+            document.getElementById('pickupInput').value = locationName;
+            pickupCoords = coords;
+            document.getElementById('pickupSuggestions').classList.remove('active');
+            
+            if (pickupMarker) map.removeLayer(pickupMarker);
+            pickupMarker = L.marker(coords, { title: 'Pickup' }).addTo(map)
+                .bindPopup(`<b>Pickup</b><br>${locationName}`).openPopup();
+            
+            updateRoute();
+        }
+
+        function selectDeliveryLocation(locationName, coords) {
+            document.getElementById('deliveryInput').value = locationName;
+            deliveryCoords = coords;
+            document.getElementById('deliverySuggestions').classList.remove('active');
+            
+            if (deliveryMarker) map.removeLayer(deliveryMarker);
+            deliveryMarker = L.marker(coords, { title: 'Delivery' }).addTo(map)
+                .bindPopup(`<b>Delivery</b><br>${locationName}`).openPopup();
+            
+            updateRoute();
+        }
+
+        function geocodeLocationNominatim(locationName, callback) {
+            const query = locationName + ', India';
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=10`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const results = data.map(item => ({
+                        name: item.display_name,
+                        coords: [parseFloat(item.lat), parseFloat(item.lon)]
+                    }));
+                    callback(results);
+                })
+                .catch(error => {
+                    console.error('Geocoding error:', error);
+                    callback([]);
+                });
+        }
+
+        function updateRoute() {
+            if (pickupCoords && deliveryCoords) {
+                if (routeLine) map.removeLayer(routeLine);
+                routeLine = L.polyline([pickupCoords, deliveryCoords], {
+                    color: '#10b981',
+                    weight: 3,
+                    opacity: 0.7,
+                    dashArray: '5, 5'
+                }).addTo(map);
+                
+                const bounds = L.latLngBounds([pickupCoords, deliveryCoords]);
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+
+        function swapLocations() {
+            const tempInput = document.getElementById('pickupInput').value;
+            document.getElementById('pickupInput').value = document.getElementById('deliveryInput').value;
+            document.getElementById('deliveryInput').value = tempInput;
+            
+            const tempCoords = pickupCoords;
+            pickupCoords = deliveryCoords;
+            deliveryCoords = tempCoords;
+            
+            updateRoute();
+        }
+
+        function calculateDistance() {
+            if (!pickupCoords || !deliveryCoords) {
+                alert('Please select both pickup and delivery locations');
+                return;
+            }
+
+            // Use Google Maps Directions API for real road distance (same as Google Maps)
+            if (googleApiLoaded && typeof google !== 'undefined' && google.maps) {
+                const directionsService = new google.maps.DirectionsService();
+                const origin = new google.maps.LatLng(pickupCoords[0], pickupCoords[1]);
+                const destination = new google.maps.LatLng(deliveryCoords[0], deliveryCoords[1]);
+
+                document.getElementById('distanceValue').textContent = 'Calculating...';
+                document.getElementById('distanceResult').classList.add('show');
+
+                directionsService.route({
+                    origin: origin,
+                    destination: destination,
+                    travelMode: google.maps.TravelMode.DRIVING
+                }, function(result, status) {
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        // Road distance in metres → km
+                        const distanceMetres = result.routes[0].legs[0].distance.value;
+                        const distance = distanceMetres / 1000;
+
+                        // Draw the actual road route on the map
+                        if (routeLine) map.removeLayer(routeLine);
+                        const path = result.routes[0].overview_path.map(p => [p.lat(), p.lng()]);
+                        routeLine = L.polyline(path, {
+                            color: '#10b981',
+                            weight: 4,
+                            opacity: 0.85
+                        }).addTo(map);
+                        const bounds = L.latLngBounds(path);
+                        map.fitBounds(bounds, { padding: [50, 50] });
+
+                        applyPricing(distance);
+                    } else {
+                        // Fallback to Haversine if Directions API fails
+                        console.warn('Directions API failed:', status, '— falling back to straight-line distance');
+                        const distance = haversineDistance(pickupCoords, deliveryCoords);
+                        applyPricing(distance, true);
+                    }
+                });
+            } else {
+                // No Google API — use Haversine fallback
+                const distance = haversineDistance(pickupCoords, deliveryCoords);
+                applyPricing(distance, true);
+            }
+        }
+
+        // Haversine straight-line distance (fallback only)
+        function haversineDistance(a, b) {
+            const R = 6371;
+            const dLat = (b[0] - a[0]) * Math.PI / 180;
+            const dLng = (b[1] - a[1]) * Math.PI / 180;
+            const x = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(a[0] * Math.PI / 180) * Math.cos(b[0] * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+        }
+
+        function applyPricing(distance, isStraightLine) {
+            const selected = document.querySelector('input[name="cargoWeight"]:checked');
+            const surcharge = selected ? parseInt(selected.value) : 0;
+
+            const basePrice = 160;
+            const perKm = 20;
+            const distanceFare = distance * perKm;
+            let total = basePrice + distanceFare + surcharge;
+
+            if (distance <= 3) {
+                total = 160 + surcharge;
+                if (total < 160) total = 160;
+            }
+            if (total < 160) total = 160;
+
+            const label = isStraightLine
+                ? distance.toFixed(2) + ' km (approx — road distance unavailable)'
+                : distance.toFixed(2) + ' km (road distance)';
+            document.getElementById('distanceValue').textContent = label;
+
+            const surchargeRow = document.getElementById('surchargeRow');
+            if (surcharge > 0) {
+                surchargeRow.style.display = 'flex';
+                document.getElementById('surchargeAmount').textContent = '+Rs ' + surcharge;
+            } else {
+                surchargeRow.style.display = 'none';
+            }
+
+            // Show loyalty discount note (not applied automatically)
+            const loyaltyRow = document.getElementById('loyaltyRow');
+            loyaltyRow.style.display = 'flex';
+            document.getElementById('discountAmount').textContent = 'After 5th trip';
+
+            document.getElementById('totalPrice').textContent = 'Rs ' + total.toFixed(0);
+            document.getElementById('distanceResult').classList.add('show');
+
+            document.getElementById('carbondistance').value = distance.toFixed(2);
+            document.getElementById('certDistance').value = distance.toFixed(2);
+        }
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) element.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openWhatsApp() {
+            window.open('https://wa.me/919740530022?text=Hi%20GEL%21%20I%20want%20to%20know%20more', '_blank');
+        }
+
+        function calculateCarbon() {
+            const distance = parseFloat(document.getElementById('carbondistance').value);
+            if (!distance || distance <= 0) {
+                alert('Enter valid distance');
+                return;
+            }
+            const co2Saved = ((250 - 50) * distance / 1000).toFixed(2);
+            const trees = (co2Saved / 21).toFixed(3);
+            const air = Math.round(co2Saved * 5);
+            const fuel = ((90 / 5) * distance).toFixed(0);
+            
+            document.getElementById('co2Saved').textContent = co2Saved + ' kg';
+            document.getElementById('treesEquiv').textContent = trees + ' trees';
+            document.getElementById('airQuality').textContent = air + ' min';
+            document.getElementById('dieselSaved').textContent = 'Rs ' + fuel;
+            document.getElementById('carbonResult').classList.add('show');
+        }
+
+        function generateAndPreviewCertificate() {
+            if (!validateForm()) return;
+            populateCertificate();
+            document.getElementById('certificatePreview').classList.add('show');
+            document.getElementById('downloadButtonContainer').style.display = 'block';
+            setTimeout(() => document.getElementById('certificatePreview').scrollIntoView({ behavior: 'smooth' }), 100);
+        }
+
+        function generateAndDownloadCertificate() {
+            if (!validateForm()) return;
+            populateCertificate();
+            document.getElementById('certificatePreview').classList.add('show');
+            document.getElementById('downloadButtonContainer').style.display = 'block';
+            setTimeout(() => downloadCertificatePDF(), 500);
+        }
+
+        function validateForm() {
+            if (!document.getElementById('clientName').value || !document.getElementById('certPickup').value || 
+                !document.getElementById('certDelivery').value || !document.getElementById('certDistance').value || 
+                !document.getElementById('deliveryDate').value || !document.getElementById('contactEmail').value) {
+                alert('Please fill all fields');
+                return false;
+            }
+            return true;
+        }
+
+        function populateCertificate() {
+            const clientName = document.getElementById('clientName').value;
+            const pickup = document.getElementById('certPickup').value;
+            const delivery = document.getElementById('certDelivery').value;
+            const distance = parseFloat(document.getElementById('certDistance').value);
+            const date = document.getElementById('deliveryDate').value;
+            
+            const co2Saved = ((250 - 50) * distance / 1000).toFixed(2);
+            const trees = (co2Saved / 21).toFixed(3);
+            const air = Math.round(co2Saved * 5);
+            const fuel = ((90 / 5) * distance).toFixed(0);
+            const certId = 'GEL-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            const formattedDate = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            document.getElementById('certificatePreview').innerHTML = `
+                <div class="certificate-content">
+                    <div class="cert-header">
+                        <div class="cert-logo">🌱</div>
+                        <div class="cert-company">GREEN ELECTRIC LOGISTICS</div>
+                        <div class="cert-subtitle">Carbon Impact Certificate</div>
+                    </div>
+                    <div class="cert-body">
+                        <div class="cert-section">
+                            <div class="cert-section-title">Delivery Details</div>
+                            <div class="cert-detail">
+                                <span class="cert-label">Client Name:</span>
+                                <span class="cert-value" id="cert-clientName">${clientName}</span>
+                            </div>
+                            <div class="cert-detail">
+                                <span class="cert-label">Pickup Location:</span>
+                                <span class="cert-value" id="cert-pickupLocation">${pickup}</span>
+                            </div>
+                            <div class="cert-detail">
+                                <span class="cert-label">Delivery Location:</span>
+                                <span class="cert-value" id="cert-deliveryLocation">${delivery}</span>
+                            </div>
+                            <div class="cert-detail">
+                                <span class="cert-label">Distance:</span>
+                                <span class="cert-value" id="cert-distance">${distance} km</span>
+                            </div>
+                            <div class="cert-detail">
+                                <span class="cert-label">Delivery Date:</span>
+                                <span class="cert-value" id="cert-date">${formattedDate}</span>
+                            </div>
+                        </div>
+                        <div class="cert-impact">
+                            <div class="impact-card">
+                                <div class="impact-number" id="cert-co2">${co2Saved}</div>
+                                <div class="impact-label">KG CO2 SAVED</div>
+                            </div>
+                            <div class="impact-card">
+                                <div class="impact-number" id="cert-trees">${trees}</div>
+                                <div class="impact-label">TREES EQUIVALENT</div>
+                            </div>
+                        </div>
+                        <div class="cert-section">
+                            <div class="cert-section-title">Environmental Impact</div>
+                            <div class="cert-detail">
+                                <span class="cert-label">Electric vs Diesel Emissions:</span>
+                                <span class="cert-value" id="cert-comparison">${(250 * distance / 1000).toFixed(2)} kg vs ${(50 * distance / 1000).toFixed(2)} kg</span>
+                            </div>
+                            <div class="cert-detail">
+                                <span class="cert-label">Air Quality Improvement:</span>
+                                <span class="cert-value" id="cert-airquality">${air} minutes of clean air</span>
+                            </div>
+                            <div class="cert-detail">
+                                <span class="cert-label">Diesel Cost Avoided:</span>
+                                <span class="cert-value" id="cert-fuelcost">Rs ${fuel}</span>
+                            </div>
+                        </div>
+                        <div class="cert-footer">
+                            <p>This certificate verifies that this delivery was completed using 100% electric vehicles, resulting in significant environmental benefits.</p>
+                            <div class="cert-id" id="cert-id">${certId}</div>
+                            <div class="cert-url">www.greenelectriclogistics.com</div>
+                            <div class="cert-message">🌍 Every Delivery Counts Towards a Greener Planet!</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadCertificatePDF() {
+            const element = document.getElementById('certificatePreview');
+            html2canvas(element, { allowTaint: true, useCORS: true, scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save('GEL-Certificate.pdf');
+            });
+        }
+
+        function submitContactForm(e) {
+            e.preventDefault();
+            const name    = document.getElementById('cf_name').value.trim();
+            const email   = document.getElementById('cf_email').value.trim();
+            const phone   = document.getElementById('cf_phone').value.trim();
+            const subject = document.getElementById('cf_subject').value;
+            const message = document.getElementById('cf_message').value.trim();
+            const body = 'Name: ' + encodeURIComponent(name) + '%0AEmail: ' + encodeURIComponent(email) + '%0APhone: ' + encodeURIComponent(phone || 'Not provided') + '%0A%0AMessage:%0A' + encodeURIComponent(message);
+            const mailtoLink = 'mailto:greenelectriclogistics@gmail.com?subject=' + encodeURIComponent('[GEL Website] ' + subject) + '&body=' + body;
+            window.location.href = mailtoLink;
+            document.getElementById('contactRequestForm').reset();
+            const success = document.getElementById('formSuccess');
+            success.classList.add('show');
+            setTimeout(() => success.classList.remove('show'), 6000);
+        }
+
+        window.addEventListener('load', initMap);
+    </script>
+</body>
+</html>
